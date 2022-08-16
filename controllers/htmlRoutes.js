@@ -5,17 +5,20 @@ const withAuth = require('../utils/auth');
 // route for getting the homepage for user to read
 router.get('/', async (req, res) => {
     try {
+        // get all posts, join with user data
         const postData = await Post.findAll({
             include: [
                 {
                     model: User,
-                    attributes: ['name']
+                    attributes: ['username']
                 }
             ]
         });
 
+        // serialize the post data so it can be read by template
         const posts = postData.map((post) => post.get({ plain: true }));
 
+        //pass serialized data and session flag to template for homepage
         res.render('homepage', {
             posts,
             logged_in: req.session.logged_in
@@ -28,18 +31,24 @@ router.get('/', async (req, res) => {
 
 router.get('/post/:id', async (req, res) => {
     try{
+        // get single post by id and include User and attr name
         const postData = await Post.findByPk(req.params.id, {
             include: [
                 {
                     model: User,
                     attributes: ['name']
+                },
+                {
+                    model: Comment
                 }
             ]
         });
 
+        // serialize data to enable template to read
         const post = postData.get({ plain: true });
 
-        res.render('', {
+        // pass serialized data and session flag to template for 
+        res.render('dashboard', {
             ...post,
             logged_in: req.session.logged_in
         });
@@ -75,6 +84,15 @@ router.get('/login', (req, res) => {
     }
 
     res.render('login');
+});
+
+router.get('/signup', (req, res) => {
+    if(req.session.logged_in) {
+        res.redirect('/homepage');
+        return;
+    }
+    
+    res.render('signup');
 });
 
 module.exports = router;

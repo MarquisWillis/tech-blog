@@ -2,7 +2,7 @@ const router = require('express').Router();
 const { User } = require('../../models');
 
 // route for creating an account
-router.post('/', async (req, res) => {
+router.post('/signup', async (req, res) => {
     try {
         const userData = await User.create(req.body);
 
@@ -52,7 +52,7 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// handles logout process
+// route for handling logout
 router.post('/logout', (req, res) => {
     if (require.session.logged_in) {
         require.session.destroy(() => {
@@ -62,5 +62,6 @@ router.post('/logout', (req, res) => {
         res.status(404).end();
     }
 });
+
 
 module.exports = router;
